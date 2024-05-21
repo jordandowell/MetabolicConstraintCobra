@@ -18,11 +18,10 @@ from cobra.io import read_sbml_model
 data_dir = Path("Data")
 data_dir.resolve()
 #import and save model
-AT_model_path = data_dir / "ATH_SECOND.xml"
+AT_model_path = data_dir / "ATH_Masscorrected_01.xml"
 AT_model = read_sbml_model(str(AT_model_path.resolve()))
 AT_model_Universal = read_sbml_model(str(AT_model_path.resolve()))
 #assess basic descriptions
-
 
 #number of reactiuons
 print(len(AT_model.reactions))
@@ -31,7 +30,47 @@ print(len(AT_model.metabolites))
 #number of genes 
 print((AT_model.genes))
 
+AT_model_Universal.reactions.get_by_id("Camalexin001_c0")
 
+
+##### cut an paste pathways here. 
+
+
+
+## adding the camalexin pathway 
+#makesure you have came from running script 1 
+
+from cobra import Model, Reaction, Metabolite
+
+#Reaction 1
+reaction01 = Reaction('Camalexin001_c0')
+reaction01.name = 'Tryptophan N-monooxygenase'
+reaction01.subsystem = 'c0'
+reaction01.lower_bound = 0.  # This is the default
+reaction01.upper_bound = 1000.  # This is the default
+
+print(AT_model_Universal.reactions.get_by_id("Camalexin008_c0"))
+
+#Reaction 1 Metabolites * Check if metabolite exists first!
+print("exchanges", AT_model.compartments)
+print("demands", AT_model.demands)
+print("sinks", AT_model.sinks)
+
+
+
+from cobra.flux_analysis import gapfill
+universal = cobra.Model("universal_reactions")
+with AT_model:
+    AT_model.objective = AT_model.add_boundary(AT_model.metabolites.cpd28220_c0, type='demand')
+    solution = gapfill(AT_model, universal)
+    for reaction in solution[0]:
+        print(reaction.id)
+
+
+#trying to add reactions 
+# create exchange reaction
+AT_model.add_boundary(AT_model.metabolites.get_by_id("HCN_c0"), type="sink")
+AT_model.add_boundary(AT_model.metabolites.get_by_id("cpd28220_c0"), type="sink")
 
 #export genelist
 import pandas as pd
@@ -51,17 +90,29 @@ linear_reaction_coefficients(AT_model)
 
 print(AT_model.summary())
 # change the objective to reaction of choice
-AT_model.objective = "bio1_biomass"
+AT_model.objective = "Camalexin008_c0"
 
 #run basic flux balance analysis to see if model can grow
 
 AT_solution = AT_model.optimize()
-
+print(AT_model.summary())
 print(AT_solution)
 
 #check objective value
 
 AT_solution.objective_value
+
+
+#adding a new pathway
+
+
+
+
+
+
+
+
+
 
 #check summary
 
