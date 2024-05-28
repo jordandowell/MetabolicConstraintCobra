@@ -18,6 +18,7 @@ Tair_translation<-read.csv("Data/Tair_translation.csv")
 Enzyme_geneNames<-as.data.frame(unlist(c(Model_genelist,Tair_translation[,2])))
 #hostRNA 
 HOST_RNA<-read.csv("Data/Host_RNAseq_Counts.csv")
+<<<<<<< HEAD
 #hostCamalexin
 HOST_Camalexin<-read.csv("Data/Camalexin_Constraints.csv")
 
@@ -26,6 +27,12 @@ HOST_RNA<-HOST_RNA[,c("gene",intersect(colnames(HOST_RNA), HOST_Camalexin$Sample
 
 
 #segment Gene names to query rows. 
+=======
+
+
+#segment Gene names to query rows. 
+
+>>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
 TranscriptNames<-HOST_RNA[,1]
 #remove the .1 variations
 

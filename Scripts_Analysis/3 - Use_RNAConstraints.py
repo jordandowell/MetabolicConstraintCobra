@@ -7,6 +7,7 @@
 AT_model = read_sbml_model(str(AT_model_path.resolve()))
 #Make sure that it will run with 0 constraints
 
+<<<<<<< HEAD
 ##### Add compartments. 
 AT_model.compartments |= {'c0': 'Cytosol', 'd0': 'Plastid', 'g0': 'Golgi', 'v0': 'Vacuole', 'w0': 'Wall', 'x0': 'Peroxisome', 'm0': 'Mitochondria', 'n0': 'Nucleus', 'r0': 'EndoplasmicReticulum', 'e0': 'External', 'j0': 'Mitochondrialintermembrane'}
 
@@ -15,16 +16,21 @@ AT_model.add_boundary(AT_model.metabolites.get_by_id("HCN_c0"), type="sink")
 AT_model.add_boundary(AT_model.metabolites.get_by_id("cpd28220_c0"), type="sink")
 
 
+=======
+>>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
 
 
 ####import Bioconstraint
 BiosyntheticConstraints = pd.read_csv("Data/BiosyntheticConstraints.csv")
 BiosyntheticConstraints.head()
 
+<<<<<<< HEAD
 #import Camalexin Constraints
 CamalexinConstraints = pd.read_csv("Data/Camalexin_Constraints.csv")
 CamalexinValues = CamalexinConstraints.iloc[j,1]
 
+=======
+>>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
 BiosyntheticConstraints.drop(columns=BiosyntheticConstraints.columns[0]).columns.values.tolist()
 
 
@@ -50,7 +56,10 @@ os.walk(Output_dir)[1]
 
 Minimum_FLUX_Value = float(1)
 
+<<<<<<< HEAD
 BiosyntheticConstraints.columns[2]
+=======
+>>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
 
 FLUX_DATA = []
 j = 0
@@ -118,6 +127,7 @@ for j in range(1,len(BiosyntheticConstraints.columns)):
         #AT_model.reactions[i].upper_bound = 0
       #else: 
         # AT_model.reactions[i].upper_bound = NewBound
+<<<<<<< HEAD
         
         
         ##Add Camalexin biomass addition
@@ -137,6 +147,12 @@ AT_model.reactions.bio1_biomass.reaction
   # store DataFrame in list
   FLUX_DATA.append(pd.DataFrame(AT_solution.fluxes))
   print(AT_solution.summary())
+=======
+  AT_solution = AT_model.optimize()
+  # store DataFrame in list
+  FLUX_DATA.append(pd.DataFrame(AT_solution.fluxes))
+  print(AT_solution)
+>>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
 
 
 # see pd.concat documentation for more info
