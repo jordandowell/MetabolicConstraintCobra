@@ -22,18 +22,18 @@ AT_model_path = data_dir / "ATH_Masscorrected_01.xml"
 AT_model = read_sbml_model(str(AT_model_path.resolve()))
 AT_model_Universal = read_sbml_model(str(AT_model_path.resolve()))
 #assess basic descriptions
-<<<<<<< HEAD
+
 #check the compartment names if they are missing add them here
-{'c0': 'Cytosol', 'd0': 'Plastid', 'g0': 'Golgi', 'v0': 'Vacuole', 'w0': 'Wall', 'x0': 'Peroxisome', 'm0': 'Mitochondria', 'n0': 'Nucleus', 'r0': 'EndoplasmicReticulum', 'e0': 'External', 'j0': 'Mitochondrialintermembrane'}
-=======
->>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
+#{'c0': 'Cytosol', 'd0': 'Plastid', 'g0': 'Golgi', 'v0': 'Vacuole', 'w0': 'Wall', 'x0': 'Peroxisome', 'm0': 'Mitochondria', 'n0': 'Nucleus', 'r0': 'EndoplasmicReticulum', 'e0': 'External', 'j0': 'Mitochondrialintermembrane'}
+
+
 
 #number of reactiuons
 print(len(AT_model.reactions))
 #number of Metbaolites
 print(len(AT_model.metabolites))
 #number of genes 
-<<<<<<< HEAD
+
 print(len(AT_model.genes))
 
 print(AT_model_Universal.reactions.get_by_id("bio2_biomass"))
@@ -48,7 +48,7 @@ AT_model.compartments
 
 from cobra import Model, Reaction, Metabolite
 
-=======
+
 print((AT_model.genes))
 
 AT_model_Universal.reactions.get_by_id("Camalexin001_c0")
@@ -69,24 +69,21 @@ reaction01.name = 'Tryptophan N-monooxygenase'
 reaction01.subsystem = 'c0'
 reaction01.lower_bound = 0.  # This is the default
 reaction01.upper_bound = 1000.  # This is the default
->>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
 
 print(AT_model_Universal.reactions.get_by_id("Camalexin008_c0"))
 
 #Reaction 1 Metabolites * Check if metabolite exists first!
-<<<<<<< HEAD
+
 print("exchanges", AT_model.exchanges)
 print("demands", AT_model.demands)
 print("sinks", AT_model.sinks)
 
 #replace compound with any that you have added to check if you need to add a type of reaction
-=======
+
 print("exchanges", AT_model.compartments)
 print("demands", AT_model.demands)
 print("sinks", AT_model.sinks)
 
-
->>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
 
 from cobra.flux_analysis import gapfill
 universal = cobra.Model("universal_reactions")
@@ -98,7 +95,7 @@ with AT_model:
 
 
 #trying to add reactions 
-<<<<<<< HEAD
+
 # create demand reactions for HCN and camalexin so can be  'excreted'
 AT_model.add_boundary(AT_model.metabolites.get_by_id("HCN_c0"), type="demand")
 AT_model.add_boundary(AT_model.metabolites.get_by_id("cpd28220_c0"), type="demand")
@@ -126,11 +123,10 @@ AT_model.reactions.bio1_biomass.subtract_metabolites({"cpd28220_c0": CamalexinVa
 BiomassMetabolites["cpd28220_c0"] = 0.0
 
 
-=======
+
 # create exchange reaction
 AT_model.add_boundary(AT_model.metabolites.get_by_id("HCN_c0"), type="sink")
 AT_model.add_boundary(AT_model.metabolites.get_by_id("cpd28220_c0"), type="sink")
->>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
 
 #export genelist
 import pandas as pd
@@ -149,7 +145,7 @@ from cobra.util.solver import linear_reaction_coefficients
 linear_reaction_coefficients(AT_model)
 
 print(AT_model.summary())
-<<<<<<< HEAD
+
 #reducing avliable carbon and oxygen media
 #name media
 Media = AT_model.medium
@@ -181,10 +177,9 @@ print(AT_model.objective)
 EX_cpd00076_e0
 
 
-=======
+
 # change the objective to reaction of choice
 AT_model.objective = "Camalexin008_c0"
->>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
 
 #run basic flux balance analysis to see if model can grow
 
@@ -192,10 +187,7 @@ AT_solution = AT_model.optimize()
 print(AT_model.summary())
 print(AT_solution)
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
 #check objective value
 
 AT_solution.objective_value
