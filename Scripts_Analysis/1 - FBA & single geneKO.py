@@ -41,7 +41,7 @@ print(AT_model_Universal.reactions.get_by_id("bio2_biomass"))
 print(AT_model.objective)
 ##### cut an paste pathways here. 
 AT_model.compartments |= {'c0': 'Cytosol', 'd0': 'Plastid', 'g0': 'Golgi', 'v0': 'Vacuole', 'w0': 'Wall', 'x0': 'Peroxisome', 'm0': 'Mitochondria', 'n0': 'Nucleus', 'r0': 'EndoplasmicReticulum', 'e0': 'External', 'j0': 'Mitochondrialintermembrane'}
-AT_model.compartments
+#AT_model.compartments
 
 ## adding the camalexin pathway exchange reationcs
 #you need exchange reactions because the metabolite needs to be 'consumed'
