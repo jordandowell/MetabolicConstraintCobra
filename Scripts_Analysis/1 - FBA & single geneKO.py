@@ -151,14 +151,10 @@ print(AT_model.summary())
 Media = AT_model.medium
 #remove oxygen
 Media["EX_cpd00007_e0"] = 0.0
-
 #remove sucrose
-
 Media["EX_cpd00076_e0"] = 0.0
-
 #remove Urea
 Media["EX_cpd00073_e0"] = 0.0
-
 #add new media amounts back!
 AT_model.medium = Media
 

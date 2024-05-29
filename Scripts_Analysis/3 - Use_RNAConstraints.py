@@ -1,41 +1,65 @@
 ##### Using RNA for Biosyntheic constraint
 
 #Make sure in python 2.7
+#imports
+import cobra
+import micom
+import os
+#specific imports
 
+from cobra.io import load_model
+import math
+#import model from desktop 
+#specific imports
+from pathlib import Path
+from cobra.io import read_sbml_model
 
 #importmodel if necessary 
 AT_model = read_sbml_model(str(AT_model_path.resolve()))
 #Make sure that it will run with 0 constraints
 
-<<<<<<< HEAD
 ##### Add compartments. 
 AT_model.compartments |= {'c0': 'Cytosol', 'd0': 'Plastid', 'g0': 'Golgi', 'v0': 'Vacuole', 'w0': 'Wall', 'x0': 'Peroxisome', 'm0': 'Mitochondria', 'n0': 'Nucleus', 'r0': 'EndoplasmicReticulum', 'e0': 'External', 'j0': 'Mitochondrialintermembrane'}
 
+#add camalexin
+NGpermm = -6.2 #camalexin EC50 for botrytis
+CamalexinValue =  NGpermm*10**-6
+AT_model.reactions.bio1_biomass.add_metabolites({"cpd28220_c0": CamalexinValue})
+AT_model.reactions.bio1_biomass.reaction
 # create exchange reactions for HCN and camalexin so they are 'excreted'
 AT_model.add_boundary(AT_model.metabolites.get_by_id("HCN_c0"), type="sink")
-AT_model.add_boundary(AT_model.metabolites.get_by_id("cpd28220_c0"), type="sink")
 
-
-=======
->>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
-
+#reducing avliable carbon sources and oxygen media
+#name media
+Media = AT_model.medium
+#remove oxygen
+Media["EX_cpd00007_e0"] = 0.0
+#remove sucrose
+Media["EX_cpd00076_e0"] = 0.0
+#remove Urea
+Media["EX_cpd00073_e0"] = 0.0
+#add new media amounts back!
+AT_model.medium = Media
+from cobra.medium import minimal_medium
+Minimalsolution=minimal_medium(AT_model, 1)
+print(Minimalsolution)
+minimal_medium(AT_model, AT_model.slim_optimize())
+AT_model.slim_optimize()
+AT_model.optimize()
 
 ####import Bioconstraint
 BiosyntheticConstraints = pd.read_csv("Data/BiosyntheticConstraints.csv")
 BiosyntheticConstraints.head()
 
-<<<<<<< HEAD
+
 #import Camalexin Constraints
 CamalexinConstraints = pd.read_csv("Data/Camalexin_Constraints.csv")
-CamalexinValues = CamalexinConstraints.iloc[j,1]
+CamalexinConstraints.head()
+#CamalexinValues = CamalexinConstraints.iloc[j,1]
 
-=======
->>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
 BiosyntheticConstraints.drop(columns=BiosyntheticConstraints.columns[0]).columns.values.tolist()
 
 
-j=870
-type(AT_model.reactions[j].lower_bound)
 
 
 #test replacement of constraints for one column
@@ -56,10 +80,9 @@ os.walk(Output_dir)[1]
 
 Minimum_FLUX_Value = float(1)
 
-<<<<<<< HEAD
-BiosyntheticConstraints.columns[2]
-=======
->>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
+
+
+
 
 FLUX_DATA = []
 j = 0
@@ -127,32 +150,32 @@ for j in range(1,len(BiosyntheticConstraints.columns)):
         #AT_model.reactions[i].upper_bound = 0
       #else: 
         # AT_model.reactions[i].upper_bound = NewBound
-<<<<<<< HEAD
         
         
         ##Add Camalexin biomass addition
         #add camalexin
-        
-        
-  #SOLVE MODEL 
+      #find camalexin row to add
+     
+       
+  #find host camalexin row data 
+       
+  HostCamelxinRow = CamalexinConstraints.loc[CamalexinConstraints['SampleName'] == BiosyntheticConstraints.columns[j]]
+  HostCamelxinValue = HostCamelxinRow.iloc[0,2]
+  
   #Clear camalexin
   #Remove current Camalexin Value 
   CurrentCamalexin = AT_model.reactions.bio1_biomass.metabolites.popitem()
   AT_model.reactions.bio1_biomass.subtract_metabolites({"cpd28220_c0": CurrentCamalexin[-1]})
   #add new Camalexin value on a ng/g basis 
-  AT_model.reactions.bio1_biomass.add_metabolites({"cpd28220_c0": -CamalexinConstraints.iloc[j,1]*10**-6})
-AT_model.reactions.bio1_biomass.reaction
+  AT_model.reactions.bio1_biomass.add_metabolites({"cpd28220_c0": -HostCamelxinValue*10**-6})
+
     ##SOLVE Model
-  AT_solution = AT_model.optimize()
-  # store DataFrame in list
-  FLUX_DATA.append(pd.DataFrame(AT_solution.fluxes))
-  print(AT_solution.summary())
-=======
+
   AT_solution = AT_model.optimize()
   # store DataFrame in list
   FLUX_DATA.append(pd.DataFrame(AT_solution.fluxes))
   print(AT_solution)
->>>>>>> 6140148fffe1d9cbb4038f7c24a3e0065bb5754c
+
 
 
 # see pd.concat documentation for more info
@@ -266,3 +289,17 @@ consistent_model = cobra.flux_analysis.fastcc(AT_model)
 
 
 #head back to R for GWAS
+from cobra.io import load_model
+from cobra.flux_analysis import production_envelope
+
+prod_env = production_envelope(AT_model,["EX_cpd11632_e0","EX_cpd00076_e0"])
+prod_env.head()
+
+
+
+# see pd.concat documentation for more info
+
+print(prod_env)
+
+# write DataFrame to an excel sheet 
+prod_env.to_csv('Data/Production_fluxes.csv', index=False,header=True) 
