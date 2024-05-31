@@ -8,6 +8,7 @@ import os
 #specific imports
 
 from cobra.io import load_model
+from cobra.flux_analysis import flux_variability_analysis
 import math
 #import model from desktop 
 #specific imports
@@ -45,29 +46,19 @@ Minimalsolution=minimal_medium(AT_model, 1)
 print(Minimalsolution)
 minimal_medium(AT_model, AT_model.slim_optimize())
 AT_model.slim_optimize()
-AT_model.optimize()
+AT_solution=AT_model.optimize()
 
+AT_solution.fluxes
 ####import Bioconstraint
 BiosyntheticConstraints = pd.read_csv("Data/BiosyntheticConstraints.csv")
 BiosyntheticConstraints.head()
 
-
+BiosyntheticConstraints.min()
 #import Camalexin Constraints
 CamalexinConstraints = pd.read_csv("Data/Camalexin_Constraints.csv")
 CamalexinConstraints.head()
 #CamalexinValues = CamalexinConstraints.iloc[j,1]
 
-BiosyntheticConstraints.drop(columns=BiosyntheticConstraints.columns[0]).columns.values.tolist()
-
-
-
-
-#test replacement of constraints for one column
-
-  df = pd.DataFrame(AT_solution.fluxes)
-#we will trim the expression data using this list
-df.to_csv('Data/Model_fluxes.csv', index=True,header=False) 
-  
 # we need to get model solutions in a single dataframe.
 #REMINDER min flux is = to 1
 #get the path to the outputs
@@ -86,9 +77,9 @@ Minimum_FLUX_Value = float(1)
 
 #empty dataframe to store flux
 FLUX_DATA = []
-j = 0
+j = 1
 #get iterate of expressions set for each individuals 
-for j in range(1,3):
+for j in range(1,len(BiosyntheticConstraints.columns)):
   # iterate over each individual reactions
   i = 0
   for i in range(0,len(AT_model.reactions)):
@@ -107,11 +98,11 @@ for j in range(1,3):
       #change the string into a useful equation to find the bound to use 
       GENE_String = AT_model.reactions[i].gene_reaction_rule
       # ( = min(
-      GENE_String = GENE_String.replace('(','min(1000000000000000, ')
+      GENE_String = GENE_String.replace('(','min(( ')
       # and = ,
-      GENE_String = GENE_String.replace('and',',')
+      GENE_String = GENE_String.replace('and','+')
       # or = +
-      GENE_String = GENE_String.replace('or','+')
+      #GENE_String = GENE_String.replace('or',',')
       GENE_String = GENE_String.replace(')',' )')
       
       for index in range(0,rows.shape[0]):
@@ -122,7 +113,11 @@ for j in range(1,3):
         if 'A' in GENE_String_LIST[Emptygene]:
           GENE_String = GENE_String.replace(GENE_String_LIST[Emptygene],str(0))
        #extra value is added just incase there is no min
-      NewBound = min(eval('min(1000000000000000,' + GENE_String + ',1000000000000000)'),1000000000000000)
+      GENE_String = GENE_String.replace('or',',')
+      if len(GENE_String.split()) > 1:
+        NewBound = eval(GENE_String +')')
+      else:
+        NewBound = eval(GENE_String)
       #ensure that at least some flux can occur +1
       NewBound = float(math.ceil(NewBound+Minimum_FLUX_Value))
       #setting bounds 
@@ -145,24 +140,25 @@ for j in range(1,3):
       #find camalexin row to add
      
        
-  #find host camalexin row data 
+  ###########################find host camalexin row data
        
-  HostCamelxinRow = CamalexinConstraints.loc[CamalexinConstraints['SampleName'] == BiosyntheticConstraints.columns[j]]
-  HostCamelxinValue = HostCamelxinRow.iloc[0,2]
+  #HostCamelxinRow = CamalexinConstraints.loc[CamalexinConstraints['SampleName'] == BiosyntheticConstraints.columns[j]]
+  #HostCamelxinValue = HostCamelxinRow.iloc[0,2]
   
   #Clear camalexin
   #Remove current Camalexin Value 
-  CurrentCamalexin = AT_model.reactions.bio1_biomass.metabolites.popitem()
-  AT_model.reactions.bio1_biomass.subtract_metabolites({"cpd28220_c0": CurrentCamalexin[-1]})
+  #CurrentCamalexin = AT_model.reactions.bio1_biomass.metabolites.popitem()
+  #AT_model.reactions.bio1_biomass.subtract_metabolites({"cpd28220_c0": CurrentCamalexin[-1]})
   #add new Camalexin value on a ng/g basis 
-  AT_model.reactions.bio1_biomass.add_metabolites({"cpd28220_c0": -HostCamelxinValue*10**-6})
-
+  #AT_model.reactions.bio1_biomass.add_metabolites({"cpd28220_c0": -HostCamelxinValue*10**-6})
+  ###########################
     ##SOLVE Model
 
   AT_solution = AT_model.optimize()
   # store DataFrame in list
   FLUX_DATA.append(pd.DataFrame(AT_solution.fluxes))
-  print(AT_solution)
+  print(round(j/len(BiosyntheticConstraints.columns),3)*100, "% finished; Growth = ", + round(AT_solution.objective_value,3))
+
 
 
 
@@ -173,8 +169,7 @@ FLUX_DATA = pd.concat(FLUX_DATA,axis=1)
 FLUX_DATA.columns = BiosyntheticConstraints.drop(columns=BiosyntheticConstraints.columns[0]).columns.values.tolist()
 
 # write DataFrame to an excel sheet 
-FLUX_DATA.to_csv('Data/Model_fluxes.csv', index=True,header=True) 
-
+FLUX_DATA.to_csv('Data/NoCamalexin_Sugar_Urea_Model_fluxes.csv', index=True,header=True) 
 
 
 

@@ -18,7 +18,7 @@ Enzyme_geneNames<-as.data.frame(unlist(c(Model_genelist,Tair_translation[,2])))
 #hostRNA 
 HOST_RNA<-read.csv("Data/Host_RNAseq_Counts.csv")
 
-
+setdiff(Model_genelist$V1,TranscriptNames$`Gene-id`)
 
 #delete non matching columns host camalexin was previously screened for this step
 HOST_RNA<-HOST_RNA[,c("gene",intersect(colnames(HOST_RNA), HOST_Camalexin$SampleName))]
@@ -61,12 +61,23 @@ BiosyntheticRNA_ready<-as.data.table(BiosyntheticRNA)[, lapply(.SD, sum), by = g
 #change NA to 0 
 #
 BiosyntheticRNA_ready[is.na(BiosyntheticRNA_ready)] <- 0
+i=825
+for (i in 1:nrow(BiosyntheticRNA_ready)) {
+  if (BiosyntheticRNA_ready[i,1] %in% Tair_translation$TairName){
+    BiosyntheticRNA_ready[i,1]<-
+  }
+}
+
+Tair_translation$TairName[which(Tair_translation$TairName %in% BiosyntheticRNA_ready[i,1])]
 
 
+View(Tair_translation)
+#need to replace the tair name with the model name.
 
+#e
 
 #export data 
-write.csv(BiosyntheticRNA_ready,"Data/BiosyntheticConstraints.csv",  row.names = F)
+write.csv(BiosyntheticRNA_ready,"Data/BiosyntheticConstraints_preedit.csv",  row.names = F)
 
 ####Creating Camalexin Constraints
 
