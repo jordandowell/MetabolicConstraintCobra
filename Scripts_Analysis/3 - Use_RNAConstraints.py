@@ -84,10 +84,11 @@ Minimum_FLUX_Value = float(1)
 
 
 
+#empty dataframe to store flux
 FLUX_DATA = []
 j = 0
 #get iterate of expressions set for each individuals 
-for j in range(1,len(BiosyntheticConstraints.columns)):
+for j in range(1,3):
   # iterate over each individual reactions
   i = 0
   for i in range(0,len(AT_model.reactions)):
@@ -113,28 +114,15 @@ for j in range(1,len(BiosyntheticConstraints.columns)):
       GENE_String = GENE_String.replace('or','+')
       GENE_String = GENE_String.replace(')',' )')
       
-      # simple add genes
-          # ( = min(
-     # GENE_String = GENE_String.replace('(','min(1000000000000000, ')
-      # and = ,
-    #  GENE_String = GENE_String.replace('and',',')
-      # or = +
-     # GENE_String = GENE_String.replace('or','+')
-    #  GENE_String = GENE_String.replace('and','+')
-    #  GENE_String = GENE_String.replace(')',' )')
-      
-      
-      
-      #replace the avliable genes with expression values
-      for index in range(0,rows.shape[0]): 
+      for index in range(0,rows.shape[0]):
         GENE_String = GENE_String.replace(rows.iat[index,0],str(rows.iat[index,j]))
         GENE_String_LIST = GENE_String.split()
       #add any 0s for missing genes
       for Emptygene in range(0,len(GENE_String_LIST)):
-        if  'A' in GENE_String_LIST[Emptygene]:
-         GENE_String = GENE_String.replace(GENE_String_LIST[Emptygene],str(0))
+        if 'A' in GENE_String_LIST[Emptygene]:
+          GENE_String = GENE_String.replace(GENE_String_LIST[Emptygene],str(0))
        #extra value is added just incase there is no min
-      NewBound =  min(eval('min(1000000000000000,' + GENE_String + ',1000000000000000)'),1000000000000000)
+      NewBound = min(eval('min(1000000000000000,' + GENE_String + ',1000000000000000)'),1000000000000000)
       #ensure that at least some flux can occur +1
       NewBound = float(math.ceil(NewBound+Minimum_FLUX_Value))
       #setting bounds 
@@ -175,6 +163,7 @@ for j in range(1,len(BiosyntheticConstraints.columns)):
   # store DataFrame in list
   FLUX_DATA.append(pd.DataFrame(AT_solution.fluxes))
   print(AT_solution)
+
 
 
 
@@ -292,7 +281,7 @@ consistent_model = cobra.flux_analysis.fastcc(AT_model)
 from cobra.io import load_model
 from cobra.flux_analysis import production_envelope
 
-prod_env = production_envelope(AT_model,["EX_cpd11632_e0","EX_cpd00076_e0"])
+prod_env = production_envelope(AT_model,["EX_cpd00076_e0","EX_cpd11632_e0"])
 prod_env.head()
 
 
